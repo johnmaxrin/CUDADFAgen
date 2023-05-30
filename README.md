@@ -13,4 +13,4 @@ Feel free to explore and contribute to CUDADFAGen, and let us know your feedback
 
 2. Run ```./dfagen examples/test.dfa```: This command will generate a plex.cu file, which contains the DFA table ready to be used.
 
-3.  Compile the generated plex.cu by running ```nvcc plex.cu -o plex```: This command compiles the plex.cu file and generates an executable named plex. This executable can be used to see it working. 
+3.  Compile the generated plex.cu by running ```nvcc plex.cu -o plex```: This command compiles the plex.cu file and generates an executable named plex. You may run the ```plex``` to see the working. 
