@@ -10,4 +10,4 @@ y.tab.c:	parser/dfagen.y
 	yacc -d parser/dfagen.y
 
 clean: 
-	rm -f lex.yy.c y.tab.c y.tab.h dfagen plex 
+	rm -f lex.yy.c y.tab.c y.tab.h dfagen plex plex.cu  
