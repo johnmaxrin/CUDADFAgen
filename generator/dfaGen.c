@@ -37,7 +37,7 @@ void generateHeader(FILE *file,nodeType* p, int count)
 
 }
 
-int genDFA(nodeType *p, int count)
+int genDFA(int *keyword, int keywordCount, int *regex, int regexCount)
 {
     
     FILE *file = fopen("plex.cu","w");

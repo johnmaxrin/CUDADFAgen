@@ -3,3 +3,5 @@ dfagen
 lex.yy.c
 y.tab.h
 y.tab.c
+test
+.vscode
