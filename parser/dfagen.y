@@ -1,90 +1,77 @@
 %{
+    #include<stdio.h>
+    #include<string.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "include.h"
-extern FILE* yyin;
+    void yyerror(char *);
+    int yylex(void);
 
-int yylex(void);
-void yyerror(char *); 
-nodeType *genkeyword(char *);
-void freeNode(nodeType *p);
-int genDFA(nodeType *p, int count);
-nodeType* addKeyword(nodeType *p, nodeType *list);
+    int keywordcount = 0;
+    int regexcount = 0;
+    
+    char keywords[50][20];
+    char keywordTokens[50][20];
+    char regex[50][20];
+    char regexTokens[50][20];
 
-nodeType keywordListArray[50];
-int count=0;
+    int genDFA(char [50][20], int ,char (*)[20], int);
 
 %}
 
 %union{
-    char value[50];
-    nodeType *nPtr;
+        char value[50];
+        int tokenindex;
 }
 
+%token <value> KEYWORD PATTERN TOKEN
+%token COLON SEMICOLON
 
-%token <value>KEYWORD;
-%type <nPtr> keywordList keyword ;
 %%
 
-    dfa:
-        dfa keywordList                     {genDFA($2,count);}
+
+prgm :  lines                                {genDFA(keywords,keywordcount,regex,regexcount);}
+        ;
+
+lines :                                            
+        line
+        |                                
+        lines line                                   
+        ;
+
+line :                                              
+        keyword 
         |
+        regex 
+        ;
+
+keyword:    
+        KEYWORD COLON TOKEN                {strcpy(keywords[keywordcount],$1); strcpy(keywordTokens[keywordcount++],$3);}
+        ;
+        
+regex: 
+        PATTERN COLON TOKEN                {strcpy(regex[regexcount],$1); strcpy(regexTokens[regexcount++],$3);}
         ;
 
 
-    keywordList:
-                keywordList keyword         {$$ = addKeyword($2,keywordListArray);}
-                |
-                ;
 
-    
-    keyword:
-                KEYWORD         {$$ = genkeyword($1);}
-                ;
 %%
 
-nodeType* addKeyword(nodeType *p, nodeType *list)
+extern FILE *yyin;
+
+void yyerror(char *e)
 {
-    nodeType node;
-    node.type = p->type;
-    strcpy(node.keyword.value,p->keyword.value);
-    list[count++] = node;
-
-    freeNode(p);
-    return list;
+    printf("Error: %s\n",e);
 }
 
-void freeNode(nodeType *p) {
-    if (!p) return;
-    free (p);
-}
-
-
-
-
-nodeType *genkeyword(char *value)
+int main(int argc, char *argv[])
 {
-    nodeType *p;
-    if ((p = malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+    FILE *file;
+    file = fopen(argv[1], "r");
 
-    
-    p->type = KEYWORDNODE;
-    strcpy(p->keyword.value,value);
-    return p; 
+    yyin = file;
+
+    do{
+        yyparse();
+    }while(!feof(yyin));
 }
 
-void yyerror(char *err)
-{
-    printf("Error: %s\n",err);
-}
 
-int main(int c, char *argv[])
-{
-    FILE* file = fopen(argv[1], "r");
-    yyin = file; 
-    yyparse();
-    return 0;
-}

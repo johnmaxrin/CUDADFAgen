@@ -58,7 +58,7 @@ int precedence(char);
 int *genFirstPos(Node *);
 int *genLastPos(Node *);
 void genFollowPos(Node *);
-Node *generateSyntaxTree(FILE *, char *);
+Node *generateSyntaxTree(char *);
 void markPos(Node *);
 void sort(int *, int);
 void mergeSet(int *, int *, int *);

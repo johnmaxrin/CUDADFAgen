@@ -510,5 +510,5 @@ void generateRegex(FILE *file, char *pattern)
         printf("Rejectd!\n");
     
 
-    return 0;
+    return;
 }

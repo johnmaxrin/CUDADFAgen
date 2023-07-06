@@ -1,38 +1,50 @@
 %{
-
-#include<stdio.h>
-#include<string.h>
-#include "include.h"
-void yyerror(char *);
 #include "y.tab.h"
-
-char *test;
+#include<string.h>
+char *temp;
 %}
 
 %%
-
-\"[a-zA-z]+\"              { 
-                            
-                                test = strdup(yytext+1);
-
-                                if(test[yyleng - 2] != '"')
-                                    printf("improperly terminated");
-                                else
-                                    test[yyleng- 2] = 0;
-                                strcpy(yylval.value,test);  
-                                return KEYWORD;
-                                
-                           }
+\"[a-z]+\"              { 
+                            temp = strdup(yytext+1);
+                            if(temp[yyleng - 2] != '"')
+                                printf("Call YYERROR\n");
+                            else
+                                temp[yyleng - 2] = 0;
+                            strcpy(yylval.value,temp);
+                            return KEYWORD;
+    
+                        }
 
 
-[\n \t]                     ;
-.                          {printf("Error\n");}
+[r]\"[a-z|*()]+\"           {
+                            temp = strdup(yytext+2);
+                            if(temp[yyleng - 3] != '"')
+                                printf("Call YYERROR\n");
+                            else
+                                temp[yyleng - 3] = 0;
+                            strcpy(yylval.value,temp);
+                            return PATTERN;
+                        }
 
+\:                      {return COLON;}
 
+\<[A-Z]+\>              {
+                            temp = strdup(yytext+1);
+                            if(temp[yyleng - 2] != '>')
+                                printf("Call YYERROR\n");
+                            else
+                                temp[yyleng-2] = 0;
+                            strcpy(yylval.value,temp);
+                            return TOKEN;
+                        }
+[ \t\n]                   ;
 %%
 
-int yywarp(void)
-{
-	return 1;
-}
 
+
+
+int yywrap()
+{
+    return(1);
+}
