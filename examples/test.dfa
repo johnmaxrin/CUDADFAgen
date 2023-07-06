@@ -1,2 +1,3 @@
 "ape" : <APE>
 "john" : <AJE>
+r"(a|b)*abb" : <REGEXP>

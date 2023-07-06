@@ -67,6 +67,8 @@ void makeZero(int *, int);
 int markNullable(Node *);
 extern int pos, followPos[50][50]; // Change this in global
 extern char pattern[50], augmentedPattern[50], postfixString[50];
+
+int **generateRegex(char *);
 // void printFollow();  Debug Materials
 // void printTree(Node *); Debug Materials
 // End

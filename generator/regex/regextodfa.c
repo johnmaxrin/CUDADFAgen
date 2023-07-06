@@ -448,10 +448,10 @@ int checkRegex(char *string, int **dTran, int *symbolList, int *regexAlphArray, 
     return 0;
 }
 
-void generateRegex(FILE *file, char *pattern)
+int ** generateRegex(char *pattern)
 {
 
-    int **dTran;
+    int  **dTran;
     char *newPattern = augment(pattern);
     char *postfixPattern = postfix(newPattern);
     Node *root = generateSyntaxTree(postfixPattern);
@@ -498,6 +498,9 @@ void generateRegex(FILE *file, char *pattern)
         printf("\n");
     }
 
+    /*
+    
+    *** Driver Function ***
     printf("\nEnter a string to check\n");
     char string[50];
     scanf("%s",string);
@@ -509,6 +512,24 @@ void generateRegex(FILE *file, char *pattern)
     else
         printf("Rejectd!\n");
     
+    */
+    
+
+    return dTran;
+}
+
+
+void thompsonRegex(FILE *file, char regex[50][20], int regexCount)
+{
+    int **dTran;
+    dTran = (int **)malloc(sizeof(int)*50);
+    for(int i = 0; i<50; ++i)
+        dTran[i] = (int *)malloc(sizeof(int)*50);
+
+    for(int i=0; i<regexCount; ++i)
+    {
+        dTran = generateRegex(regex[i]);
+    }
 
     return;
 }

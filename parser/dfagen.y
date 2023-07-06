@@ -13,7 +13,7 @@
     char regex[50][20];
     char regexTokens[50][20];
 
-    int genDFA(char [50][20], int ,char (*)[20], int);
+    int genDFA(char [50][20] , int ,char [50][20], int);
 
 %}
 
