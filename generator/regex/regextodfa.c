@@ -431,25 +431,9 @@ void genFollowPos(Node *root)
 } */
 
 
-int checkRegex(char *string, int **dTran, int *symbolList, int *regexAlphArray, int size, int finalState)
+int ** generateRegex(FILE *file, char *pattern, int *a, int *b, int *c, int *d)
 {
 
-    int i=0, currentState = 1;
-    while (string[i] != '\0')
-    {   
-        currentState = dTran[currentState][symbolList[regexAlphArray[string[i]-'a']]];
-        ++i;
-    }
-
-    if(finalState == currentState)
-        return 1;
-    
-
-    return 0;
-}
-
-int ** generateRegex(char *pattern)
-{
 
     int  **dTran;
     char *newPattern = augment(pattern);
@@ -486,31 +470,18 @@ int ** generateRegex(char *pattern)
     createRegexAlphArray(symbolList,regexAlphArray,count); 
 
     dTran = buildTable(start, followPos, stateList,inputSymbol, symbolList,count);
+    for(int i=0; i<26; ++i)
+        a[i] = symbolList[i];
+    
+    for(int i=0; i<26; ++i)
+        b[i] = regexAlphArray[i];
 
+    c[0] = count;
 
-    printf("\n");
-    for(int i=0; i<10; ++i)
-    {
-        for(int j=0; j<count; ++j)
-        {
-            printf("%d ",dTran[i][j]);
-        }
-        printf("\n");
-    }
-
+    d[0] = stateList->currentState;
     /*
     
     *** Driver Function ***
-    printf("\nEnter a string to check\n");
-    char string[50];
-    scanf("%s",string);
-
-    int res = checkRegex(string,dTran,symbolList,regexAlphArray,count,stateList->currentState);
-
-    if(res)
-        printf("Accepted!\n");
-    else
-        printf("Rejectd!\n");
     
     */
     
@@ -521,15 +492,111 @@ int ** generateRegex(char *pattern)
 
 void thompsonRegex(FILE *file, char regex[50][20], int regexCount)
 {
-    int **dTran;
-    dTran = (int **)malloc(sizeof(int)*50);
-    for(int i = 0; i<50; ++i)
-        dTran[i] = (int *)malloc(sizeof(int)*50);
+    int ***dTran, **symbolList, **regexAlphArray, **counts, **finalStates;
+    dTran = (int ***)malloc(sizeof(int **)*regexCount);   
+
+    symbolList = (int **)malloc(sizeof(int *)*regexCount);
+    regexAlphArray = (int **)malloc(sizeof(int *)*regexCount);
+    counts = (int **)malloc(sizeof(int *)*regexCount);
+    finalStates = (int **)malloc(sizeof(int *)*regexCount);
+
+    for(int i = 0; i<regexCount; ++i)
+    {
+        dTran[i] = (int **)malloc(sizeof(int)*50);
+
+        symbolList[i] = (int *)calloc(26,sizeof(int));
+        regexAlphArray[i] = (int *)calloc(26,sizeof(int));
+        counts[i] = (int *)calloc(20,sizeof(int));
+        finalStates[i] = (int *)calloc(20,sizeof(int));
+
+        for(int j=0; j<50; ++j)
+            dTran[i][j] = (int *)malloc(sizeof(int) * 50);    
+    }
+
 
     for(int i=0; i<regexCount; ++i)
+        dTran[i] = generateRegex(file,regex[i],symbolList[i],regexAlphArray[i],counts[i],finalStates[i]);
+    
+
+    // Print everything to file.
+    
+    // DFA TABLE
+    fprintf(file,"static int dTran[%d][50][50] = {",regexCount);
+    for(int i=0; i<regexCount; ++i)
     {
-        dTran = generateRegex(regex[i]);
+        fprintf(file,"\n\t\t\t\t\t\t{");
+        for(int j=0; j<9; ++j)
+        {
+            fprintf(file, "\n\t\t\t\t\t\t\t{");
+            for(int k=0; k<counts[i][0]-1; ++k)
+                fprintf(file, "%d, ",dTran[i][j][k]);
+            fprintf(file,"%d},",dTran[i][j][counts[i][0]-1]);
+        }
+            fprintf(file, "\n\t\t\t\t\t\t\t{");
+            for(int k=0; k<counts[i][0]-1; ++k)
+                fprintf(file, "%d, ",dTran[i][9][k]);
+            fprintf(file,"%d}",dTran[i][9][counts[i][0]-1]);
+    
+
+        fprintf(file, "\n\t\t\t\t\t\t},");
+
+
     }
+    fprintf(file,"\n};\n\n");
+
+    // Symbol List
+    fprintf(file,"static int symbolList[%d][26] = {\n",regexCount);
+    for(int i=0; i<regexCount; ++i)
+    {
+        fprintf(file, "\t\t\t\t\t\t{ ");
+        for(int j=0; j<25; ++j)
+        {
+            fprintf(file,"%d,",symbolList[i][j]);
+        }
+        fprintf(file, "%d },\n",symbolList[i][25]);
+    }
+    fprintf(file,"\n};\n\n");
+
+    // Regex Alpha Array
+    fprintf(file,"static int regexAlphArray[%d][26] = {\n",regexCount);
+    for(int i=0; i<regexCount; ++i)
+    {
+        fprintf(file, "\t\t\t\t\t\t{ ");
+        for(int j=0; j<25; ++j)
+        {
+            fprintf(file,"%d,",regexAlphArray[i][j]);
+        }
+        fprintf(file, "%d },\n",regexAlphArray[i][25]);
+    }
+    fprintf(file,"\n};\n\n");
+
+    // Counts
+    fprintf(file,"static int counts[%d][1] = {\n",regexCount);
+    for(int i=0; i<regexCount; ++i)
+    {
+        fprintf(file, "\t\t\t\t\t\t{ ");
+        for(int j=0; j<1; ++j)
+        {
+            fprintf(file,"%d",counts[i][j]);
+        }
+
+        fprintf(file," }");
+    }
+    fprintf(file,"\n};\n\n");
+
+    // Final States
+    fprintf(file,"static int finalStates[%d][5] = {\n",regexCount);
+    for(int i=0; i<regexCount; ++i)
+    {
+        fprintf(file, "\t\t\t\t\t\t{ ");
+        for(int j=0; j<1; ++j)
+        {
+            fprintf(file,"%d",finalStates[i][j]);
+        }
+
+        fprintf(file," }");
+    }
+    fprintf(file,"\n};\n\n");
 
     return;
 }

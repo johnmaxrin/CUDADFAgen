@@ -119,6 +119,7 @@ void createRegexAlphArray(int *symbolList, int *regexAlphArray, int size)
 
 void createSymbolList(int *inputSymbol, int *symbolList, int *count)
 {
+
     int i = 1,tempi=0,symbolListSize = 0,j=0,tempCount = 0;
     int temp[20] = {0}; // Global
 
